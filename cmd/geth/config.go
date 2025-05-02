@@ -232,6 +232,9 @@ func makeFullNode(ctx *cli.Context) *node.Node {
 		v := ctx.Uint64(utils.OverrideVerkle.Name)
 		cfg.Eth.OverrideVerkle = &v
 	}
+	if ctx.IsSet(utils.L1ArchiveNodeRPCFlag.Name) {
+		cfg.Eth.L1ArchiveNodeRPC = ctx.String(utils.L1ArchiveNodeRPCFlag.Name)
+	}
 
 	// Start metrics export if enabled
 	utils.SetupMetrics(&cfg.Metrics)

@@ -979,6 +979,12 @@ var (
 		Value:    5000,
 	}
 
+	L1ArchiveNodeRPCFlag = &cli.StringFlag{
+		Name:     "rollup.l1archivenoderpc",
+		Usage:    "RPC endpoint for L1 archive node.",
+		Category: flags.RollupCategory,
+	}
+
 	// Metrics flags
 	MetricsEnabledFlag = &cli.BoolFlag{
 		Name:     "metrics",
@@ -1908,6 +1914,10 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	cfg.ApplySuperchainUpgrades = ctx.Bool(RollupSuperchainUpgradesFlag.Name)
 	cfg.RollupSequencerTxConditionalEnabled = ctx.Bool(RollupSequencerTxConditionalEnabledFlag.Name)
 	cfg.RollupSequencerTxConditionalCostRateLimit = ctx.Int(RollupSequencerTxConditionalCostRateLimitFlag.Name)
+
+	if ctx.IsSet(L1ArchiveNodeRPCFlag.Name) {
+		cfg.L1ArchiveNodeRPC = ctx.String(L1ArchiveNodeRPCFlag.Name)
+	}
 
 	// Override any default configs for hard coded networks.
 	switch {

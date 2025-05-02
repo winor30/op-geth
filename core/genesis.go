@@ -300,6 +300,7 @@ type ChainOverrides struct {
 	OverrideOptimismIsthmus  *uint64
 	OverrideOptimismJovian   *uint64
 	OverrideOptimismInterop  *uint64
+	OverrideL1ArchiveNodeRPC *string
 	ApplySuperchainUpgrades  bool
 }
 
@@ -373,6 +374,9 @@ func (o *ChainOverrides) apply(cfg *params.ChainConfig) error {
 	}
 	if o.OverrideOptimismInterop != nil {
 		cfg.InteropTime = o.OverrideOptimismInterop
+	}
+	if o.OverrideL1ArchiveNodeRPC != nil {
+		cfg.L1ArchiveNodeRPC = o.OverrideL1ArchiveNodeRPC
 	}
 
 	// We check for validity after applying the overrides, even if there weren't any.

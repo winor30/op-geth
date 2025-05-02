@@ -451,6 +451,8 @@ type ChainConfig struct {
 
 	// Optimism config, nil if not active
 	Optimism *OptimismConfig `json:"optimism,omitempty"`
+
+	L1ArchiveNodeRPC *string `json:"l1ArchiveNodeRPC,omitempty"`
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.

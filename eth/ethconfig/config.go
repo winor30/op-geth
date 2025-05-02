@@ -185,6 +185,8 @@ type Config struct {
 
 	InteropMessageRPC       string `toml:",omitempty"`
 	InteropMempoolFiltering bool   `toml:",omitempty"`
+
+	L1ArchiveNodeRPC string
 }
 
 // CreateConsensusEngine creates a consensus engine for the given chain config.

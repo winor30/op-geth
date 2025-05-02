@@ -304,6 +304,10 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 		log.Warn("Optimism RegolithTime has not been set")
 	}
 
+	if chainConfig.IsOptimism() && chainConfig.L1ArchiveNodeRPC != nil {
+		log.Info("remote static call configured")
+	}
+
 	bc := &BlockChain{
 		chainConfig:   chainConfig,
 		cacheConfig:   cacheConfig,
