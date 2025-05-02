@@ -1418,6 +1418,7 @@ func (c *remoteStaticCall) Run(ctx PrecompileContext, input []byte) ([]byte, err
 		return nil, err
 	}
 	ethClient := ethclient.NewClient(rpcClient)
+	defer ethClient.Close()
 
 	to, data, err := parseRemoteStaticCallInput(input)
 	if err != nil {
