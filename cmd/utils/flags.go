@@ -983,6 +983,7 @@ var (
 		Name:     "rollup.l1archivenoderpc",
 		Usage:    "RPC endpoint for L1 archive node.",
 		Category: flags.RollupCategory,
+		Value:    "http://l1:8545",
 	}
 
 	// Metrics flags
@@ -1915,9 +1916,10 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	cfg.RollupSequencerTxConditionalEnabled = ctx.Bool(RollupSequencerTxConditionalEnabledFlag.Name)
 	cfg.RollupSequencerTxConditionalCostRateLimit = ctx.Int(RollupSequencerTxConditionalCostRateLimitFlag.Name)
 
-	if ctx.IsSet(L1ArchiveNodeRPCFlag.Name) {
-		cfg.L1ArchiveNodeRPC = ctx.String(L1ArchiveNodeRPCFlag.Name)
-	}
+	cfg.L1ArchiveNodeRPC = ctx.String(L1ArchiveNodeRPCFlag.Name)
+	// if ctx.IsSet(L1ArchiveNodeRPCFlag.Name) {
+	// 	cfg.L1ArchiveNodeRPC = ctx.String(L1ArchiveNodeRPCFlag.Name)
+	// }
 
 	// Override any default configs for hard coded networks.
 	switch {
