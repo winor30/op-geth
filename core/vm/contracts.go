@@ -40,6 +40,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto/kzg4844"
 	"github.com/ethereum/go-ethereum/crypto/secp256r1"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
 	"golang.org/x/crypto/ripemd160"
@@ -1407,16 +1408,19 @@ func (c *remoteStaticCall) RequiredGas(input []byte) uint64 {
 func (c *remoteStaticCall) Run(ctx PrecompileContext, input []byte) ([]byte, error) {
 	rpcUrl := ctx.GetL1ArchiveRpc()
 	if rpcUrl == nil {
+		log.Error("no L1 archive node RPC configured")
 		return nil, errors.New("no L1 archive node RPC configured")
 	}
 	rpcClient, err := rpc.Dial(*rpcUrl)
 	if err != nil {
+		log.Error("failed to dial L1 archive node RPC", "error", err, "rpcUrl", *rpcUrl)
 		return nil, err
 	}
 	ethClient := ethclient.NewClient(rpcClient)
 
 	to, data, err := parseRemoteStaticCallInput(input)
 	if err != nil {
+		log.Error("failed to parse remote static call input", "error", err, "input", input)
 		return nil, err
 	}
 
@@ -1424,6 +1428,7 @@ func (c *remoteStaticCall) Run(ctx PrecompileContext, input []byte) ([]byte, err
 	callArgs := ethereum.CallMsg{To: &to, Data: data}
 	result, err := ethClient.CallContractAtHash(ctx, callArgs, l1BlockHash)
 	if err != nil {
+		log.Error("failed to call contract at hash", "error", err, "l1BlockHash", l1BlockHash, "to", to, "data", data)
 		return nil, err
 	}
 
