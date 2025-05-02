@@ -237,7 +237,7 @@ func makeFullNode(ctx *cli.Context) *node.Node {
 		log.Info(fmt.Sprintf("L1 archive node RPC set. %s", cfg.Eth.L1ArchiveNodeRPC), "url", cfg.Eth.L1ArchiveNodeRPC)
 	} else {
 		log.Info("L1 archive node RPC not set")
-		cfg.Eth.L1ArchiveNodeRPC = "http://127.0.0.1:8545"
+		cfg.Eth.L1ArchiveNodeRPC = "http://simple-remotestatic-devnet--ethereum-package--el-1-geth-teku:8545"
 	}
 
 	// Start metrics export if enabled
