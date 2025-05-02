@@ -1406,6 +1406,7 @@ func (c *remoteStaticCall) RequiredGas(input []byte) uint64 {
 }
 
 func (c *remoteStaticCall) Run(ctx PrecompileContext, input []byte) ([]byte, error) {
+	log.Info("running remote static call", "input", input)
 	rpcUrl := ctx.GetL1ArchiveRpc()
 	if rpcUrl == nil {
 		log.Error("no L1 archive node RPC configured")
