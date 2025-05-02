@@ -306,8 +306,6 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 
 	if chainConfig.IsOptimism() && chainConfig.L1ArchiveNodeRPC != nil {
 		log.Info("remote static call configured")
-	} else {
-		log.Info("remote static call not configured")
 	}
 
 	bc := &BlockChain{
