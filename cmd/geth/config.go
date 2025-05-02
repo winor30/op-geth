@@ -234,6 +234,7 @@ func makeFullNode(ctx *cli.Context) *node.Node {
 	}
 	if ctx.IsSet(utils.L1ArchiveNodeRPCFlag.Name) {
 		cfg.Eth.L1ArchiveNodeRPC = ctx.String(utils.L1ArchiveNodeRPCFlag.Name)
+		log.Info(fmt.Sprintf("L1 archive node RPC set. %s", cfg.Eth.L1ArchiveNodeRPC), "url", cfg.Eth.L1ArchiveNodeRPC)
 	}
 
 	// Start metrics export if enabled
