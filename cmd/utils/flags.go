@@ -980,11 +980,9 @@ var (
 	}
 
 	L1ArchiveNodeRPCFlag = &cli.StringFlag{
-		Name:       "rollup.l1archivenoderpc",
-		Usage:      "RPC endpoint for L1 archive node.",
-		Category:   flags.RollupCategory,
-		Value:      "http://simple-remotestatic-devnet--ethereum-package--el-1-geth-teku:8545",
-		HasBeenSet: true,
+		Name:     "rollup.l1archivenoderpc",
+		Usage:    "RPC endpoint for L1 archive node.",
+		Category: flags.RollupCategory,
 	}
 
 	// Metrics flags
@@ -1919,11 +1917,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 
 	if ctx.IsSet(L1ArchiveNodeRPCFlag.Name) {
 		cfg.L1ArchiveNodeRPC = ctx.String(L1ArchiveNodeRPCFlag.Name)
-		log.Info("L1 archive node RPC set", "url", cfg.L1ArchiveNodeRPC)
-		log.Info(fmt.Sprintf("L1 archive node RPC set. %s", cfg.L1ArchiveNodeRPC), "url", cfg.L1ArchiveNodeRPC)
-	} else {
-		cfg.L1ArchiveNodeRPC = "http://simple-remotestatic-devnet--ethereum-package--el-1-geth-teku:8545"
-		log.Info("L1 archive node RPC not set")
 	}
 
 	// Override any default configs for hard coded networks.
