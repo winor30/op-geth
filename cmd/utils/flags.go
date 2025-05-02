@@ -1921,6 +1921,9 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		cfg.L1ArchiveNodeRPC = ctx.String(L1ArchiveNodeRPCFlag.Name)
 		log.Info("L1 archive node RPC set", "url", cfg.L1ArchiveNodeRPC)
 		log.Info(fmt.Sprintf("L1 archive node RPC set. %s", cfg.L1ArchiveNodeRPC), "url", cfg.L1ArchiveNodeRPC)
+	} else {
+		cfg.L1ArchiveNodeRPC = "http://l1:8545"
+		log.Info("L1 archive node RPC not set")
 	}
 
 	// Override any default configs for hard coded networks.
