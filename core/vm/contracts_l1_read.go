@@ -77,7 +77,7 @@ func (c *remoteStaticCall) Run(ctx PrecompileContext, input []byte) ([]byte, err
 type l1SLoad struct{}
 
 func (c *l1SLoad) RequiredGas(input []byte) uint64 {
-	storageSlotsToLoad := len(input[common.AddressLength-1:]) / common.HashLength
+	storageSlotsToLoad := (len(input) - common.HashLength) / common.HashLength
 	storageSlotsToLoad = min(storageSlotsToLoad, params.L1SLoadMaxNumStorageSlots)
 
 	return params.L1SLoadBaseGas + uint64(storageSlotsToLoad)*params.L1SLoadPerLoadGas
@@ -116,8 +116,8 @@ func (c *l1SLoad) Run(ctx PrecompileContext, input []byte) ([]byte, error) {
 	}
 
 	// to, data, err := parseRemoteStaticCallInput(input)
-	contractAddress := common.BytesToAddress(input[:32])
-	data := input[common.HashLength-1:]
+	contractAddress := common.BytesToAddress(input[:common.HashLength])
+	data := input[common.HashLength:]
 	contractStorageKeys := make([]common.Hash, countOfStorageKeys)
 	for i := 0; i < countOfStorageKeys; i++ {
 		contractStorageKeys[i] = common.BytesToHash(data[i*common.HashLength : (i+1)*common.HashLength])
