@@ -97,24 +97,28 @@ func (c *l1SLoad) Run(ctx PrecompileContext, input []byte) ([]byte, error) {
 	ethClient := ethclient.NewClient(rpcClient)
 	defer ethClient.Close()
 
-	if len(input) < common.AddressLength+common.HashLength {
+	// (padding + address)(32 bytes) + 32 bytes * numStorageKeys
+	if len(input) < 2*common.HashLength {
 		log.Error("L1SLOAD input too short", "input", input)
 		return nil, errors.New("L1SLOAD input too short")
 	}
 
-	countOfStorageKeysToRead := (len(input) - common.AddressLength) / common.HashLength
-	isAtLeastOneSKeyToRead := countOfStorageKeysToRead > 0
-	allStorageKeys32Bytes := countOfStorageKeysToRead*common.HashLength == len(input)-common.AddressLength
+	// countOfStorageKeys := (len(input) - common.AddressLength) / common.HashLength
+	// isAtLeastOneSKeyToRead := countOfStorageKeys > 0
+	// allStorageKeys32Bytes := countOfStorageKeys*common.HashLength == len(input)-common.AddressLength
+	countOfStorageKeys := len(input)/common.HashLength - 1
+	isAtLeastOneSKeyToRead := countOfStorageKeys > 0
+	allStorageKeys32Bytes := countOfStorageKeys*common.HashLength == len(input)-common.HashLength
 
 	if !isAtLeastOneSKeyToRead || !allStorageKeys32Bytes {
-		log.Error("L1SLOAD input invalid", "input", input)
+		log.Error("L1SLOAD input invalid", "input", input, "countOfStorageKeys", countOfStorageKeys, "isAtLeastOneSKeyToRead", isAtLeastOneSKeyToRead, "allStorageKeys32Bytes", allStorageKeys32Bytes)
 		return nil, errors.New("L1SLOAD input invalid")
 	}
 
 	contractAddress := common.BytesToAddress(input[:common.AddressLength])
 	data := input[common.AddressLength-1:]
-	contractStorageKeys := make([]common.Hash, countOfStorageKeysToRead)
-	for i := 0; i < countOfStorageKeysToRead; i++ {
+	contractStorageKeys := make([]common.Hash, countOfStorageKeys)
+	for i := 0; i < countOfStorageKeys; i++ {
 		contractStorageKeys[i] = common.BytesToHash(data[i*common.HashLength : (i+1)*common.HashLength])
 	}
 
