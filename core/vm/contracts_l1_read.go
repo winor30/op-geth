@@ -115,8 +115,9 @@ func (c *l1SLoad) Run(ctx PrecompileContext, input []byte) ([]byte, error) {
 		return nil, errors.New("L1SLOAD input invalid")
 	}
 
-	contractAddress := common.BytesToAddress(input[:common.AddressLength])
-	data := input[common.AddressLength-1:]
+	// to, data, err := parseRemoteStaticCallInput(input)
+	contractAddress := common.BytesToAddress(input[:32])
+	data := input[common.HashLength-1:]
 	contractStorageKeys := make([]common.Hash, countOfStorageKeys)
 	for i := 0; i < countOfStorageKeys; i++ {
 		contractStorageKeys[i] = common.BytesToHash(data[i*common.HashLength : (i+1)*common.HashLength])
