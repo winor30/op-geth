@@ -17,7 +17,6 @@
 package vm
 
 import (
-	"context"
 	"errors"
 	"math/big"
 	"sync/atomic"
@@ -48,30 +47,6 @@ func (evm *EVM) precompile(addr common.Address) (PrecompiledContract, bool) {
 		return override, override != nil
 	}
 	return p, ok
-}
-
-var _ PrecompileContext = &PrecompileContextImpl{}
-
-type PrecompileContextImpl struct {
-	context.Context
-	stateDb      StateDB
-	L1ArchiveRPC *string
-}
-
-func (p *PrecompileContextImpl) GetState(addr common.Address, slot common.Hash) common.Hash {
-	return p.stateDb.GetState(addr, slot)
-}
-
-func (p *PrecompileContextImpl) GetL1ArchiveRpc() *string {
-	return p.L1ArchiveRPC
-}
-
-func (evm *EVM) getPrecompileContext() *PrecompileContextImpl {
-	return &PrecompileContextImpl{
-		Context:      context.Background(),
-		stateDb:      evm.StateDB,
-		L1ArchiveRPC: evm.ChainConfig().L1ArchiveNodeRPC,
-	}
 }
 
 // BlockContext provides the EVM with auxiliary information. Once provided
@@ -173,7 +148,11 @@ func NewEVM(blockCtx BlockContext, statedb StateDB, chainConfig *params.ChainCon
 		chainRules:  chainConfig.Rules(blockCtx.BlockNumber, blockCtx.Random != nil, blockCtx.Time),
 		jumpDests:   make(map[common.Hash]bitvec),
 	}
-	evm.precompiles = activePrecompiledContracts(evm.chainRules)
+	precompiles := activePrecompiledContracts(evm.chainRules)
+	if evm.chainConfig.L1ArchiveNodeRPC != nil {
+		precompiles.SetL1Syncer(evm.StateDB, *evm.chainConfig.L1ArchiveNodeRPC)
+	}
+	evm.precompiles = precompiles
 	evm.interpreter = NewEVMInterpreter(evm)
 	return evm
 }
@@ -266,7 +245,7 @@ func (evm *EVM) Call(caller common.Address, addr common.Address, input []byte, g
 	evm.Context.Transfer(evm.StateDB, caller, addr, value)
 
 	if isPrecompile {
-		ret, gas, err = RunPrecompiledContract(evm.getPrecompileContext(), p, input, gas, evm.Config.Tracer)
+		ret, gas, err = RunPrecompiledContract(p, input, gas, evm.Config.Tracer)
 	} else {
 		// Initialise a new contract and set the code that is to be used by the EVM.
 		code := evm.resolveCode(addr)
@@ -331,7 +310,7 @@ func (evm *EVM) CallCode(caller common.Address, addr common.Address, input []byt
 
 	// It is allowed to call precompiles, even via delegatecall
 	if p, isPrecompile := evm.precompile(addr); isPrecompile {
-		ret, gas, err = RunPrecompiledContract(evm.getPrecompileContext(), p, input, gas, evm.Config.Tracer)
+		ret, gas, err = RunPrecompiledContract(p, input, gas, evm.Config.Tracer)
 	} else {
 		// Initialise a new contract and set the code that is to be used by the EVM.
 		// The contract is a scoped environment for this execution context only.
@@ -375,7 +354,7 @@ func (evm *EVM) DelegateCall(originCaller common.Address, caller common.Address,
 
 	// It is allowed to call precompiles, even via delegatecall
 	if p, isPrecompile := evm.precompile(addr); isPrecompile {
-		ret, gas, err = RunPrecompiledContract(evm.getPrecompileContext(), p, input, gas, evm.Config.Tracer)
+		ret, gas, err = RunPrecompiledContract(p, input, gas, evm.Config.Tracer)
 	} else {
 		// Initialise a new contract and make initialise the delegate values
 		//
@@ -428,7 +407,7 @@ func (evm *EVM) StaticCall(caller common.Address, addr common.Address, input []b
 	evm.StateDB.AddBalance(addr, new(uint256.Int), tracing.BalanceChangeTouchAccount)
 
 	if p, isPrecompile := evm.precompile(addr); isPrecompile {
-		ret, gas, err = RunPrecompiledContract(evm.getPrecompileContext(), p, input, gas, evm.Config.Tracer)
+		ret, gas, err = RunPrecompiledContract(p, input, gas, evm.Config.Tracer)
 	} else {
 		// Initialise a new contract and set the code that is to be used by the EVM.
 		// The contract is a scoped environment for this execution context only.
